@@ -8,7 +8,7 @@ import utils
 
 
 @th.inference_mode()
-def main(weights_path: str, config_path: str, data_path: str) -> None:
+def main(checkpoint_path: str, config_path: str, data_path: str) -> None:
 
     dataset = tv.datasets.ImageFolder(data_path, transform=tv.transforms.ToTensor())
     dataloader = thud.DataLoader(dataset)
@@ -19,7 +19,7 @@ def main(weights_path: str, config_path: str, data_path: str) -> None:
         config = json.load(f)
     model = modules.IRN(num_channels=config["num_channels"],
                         transform_cfgs=config["transforms"]).to(device)
-    utils.load_state(weights_path, model)
+    utils.load_state(checkpoint_path, model)
     print(f"Loaded {config_path} model ({device}) with {utils.count_parameters(model)} parameters.")
 
     print(f"Starting evaluation for {2 ** len(config['transforms'])}x.")
@@ -43,9 +43,9 @@ def main(weights_path: str, config_path: str, data_path: str) -> None:
 if __name__ == "__main__":
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument("--weights_path", type=str, required=True)
+    parser.add_argument("--checkpoint_path", type=str, required=True)
     parser.add_argument("--config_path", type=str, required=True)
     parser.add_argument("--data_path", type=str, required=True)
     args = parser.parse_args()
 
-    main(weights_path=args.weights_path, config_path=args.config_path, data_path=args.data_path)
+    main(checkpoint_path=args.checkpoint_path, config_path=args.config_path, data_path=args.data_path)

@@ -42,17 +42,17 @@ def main(batch_size: int,
 
     optim = th.optim.AdamW(model.parameters(), lr=config["learning_rate"], weight_decay=config["weight_decay"])
     sched = th.optim.lr_scheduler.StepLR(optim, round(1e5 / len(dataloader)), gamma=0.5)
-    cur_epoch = -1
+    cur_epoch = 0
     if checkpoint_path is not None:
         cur_epoch = utils.load_state(checkpoint_path, model, optim, sched)
         print(f"Resuming from {checkpoint_path}, epoch {cur_epoch}.")
 
     s = 2 ** len(config["transforms"])
     grad_clip = config["gradient_clip"]
-    max_epoch = epochs + cur_epoch + 1
+    max_epoch = epochs + cur_epoch
 
-    print(f"Starting training with scale {s}.")
-    for e in range(cur_epoch + 2, max_epoch + 1):
+    print(f"Starting training for {s}x.")
+    for e in range(cur_epoch + 1, max_epoch + 1):
         avg_loss, avg_hr_loss, avg_lr_loss, avg_pdm_loss = 0, 0, 0, 0
         start = time.perf_counter()
         if th.cuda.is_available():
@@ -80,11 +80,11 @@ def main(batch_size: int,
             th.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
             optim.step()
         sched.step()
-        print(f"Epoch {str(e + 1).zfill(len(str(max_epoch)))}/{max_epoch}, \
+        utils.save_state(save_path, model, optim, sched, epoch=e)
+        print(f"Epoch {str(e).zfill(len(str(max_epoch)))}/{max_epoch}, \
               Avg Loss: {avg_loss:.6e}, Avg HR Loss: {avg_hr_loss:.6e}, Avg LR Loss: {avg_lr_loss:.6e}, \
               Avg PDM Loss: {avg_pdm_loss:.6e}, Time: {time.perf_counter() - start:.2f} s, \
               Max Mem: {th.cuda.max_memory_allocated() / 1e9:.2f} GB")
-        utils.save_state(save_path, model, optim, sched, epoch=e)
 
 
 if __name__ == "__main__":
