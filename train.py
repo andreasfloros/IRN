@@ -66,7 +66,7 @@ def main(batch_size: int,
             c, d = model(x)
             lr_loss = th.nn.functional.mse_loss(c, xlr, reduction="sum") / c.shape[0]
             pdm_loss = (d ** 2).sum() / d.shape[0]
-            z = th.randn_like(d)
+            z = th.zeros_like(d)
             c = model.inverse(utils.quantize(c), z)
             hr_loss = utils.charbonnier_loss(c, x)
             loss = hr_loss + pdm_loss + lr_loss * s ** 2
