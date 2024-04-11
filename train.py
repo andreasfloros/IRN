@@ -42,13 +42,14 @@ def main(batch_size: int,
 
     optim = th.optim.AdamW(model.parameters(), lr=config["learning_rate"], weight_decay=config["weight_decay"])
     sched = th.optim.lr_scheduler.StepLR(optim, round(1e5 / len(dataloader)), gamma=0.5)
-    cur_epoch = 0
+
     if checkpoint_path is not None:
-        cur_epoch = utils.load_state(checkpoint_path, model, optim, sched)
-        print(f"Resuming from {checkpoint_path}, epoch {cur_epoch}.")
+        utils.load_state(checkpoint_path, model, optim, sched)
+        print(f"Resuming from {checkpoint_path}, epoch {sched.last_epoch + 1}.")
 
     s = 2 ** len(config["transforms"])
     grad_clip = config["gradient_clip"]
+    cur_epoch = sched.last_epoch + 1
     max_epoch = epochs + cur_epoch
 
     print(f"Starting training for {s}x.")
@@ -80,7 +81,7 @@ def main(batch_size: int,
             th.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
             optim.step()
         sched.step()
-        utils.save_state(save_path, model, optim, sched, epoch=e)
+        utils.save_state(save_path, model, optim, sched)
         print(f"Epoch {str(e).zfill(len(str(max_epoch)))}/{max_epoch}, \
               Avg Loss: {avg_loss:.6e}, Avg HR Loss: {avg_hr_loss:.6e}, Avg LR Loss: {avg_lr_loss:.6e}, \
               Avg PDM Loss: {avg_pdm_loss:.6e}, Time: {time.perf_counter() - start:.2f} s, \

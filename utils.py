@@ -5,8 +5,7 @@ from typing import Optional
 def save_state(checkpoint_path: str,
                model: th.nn.Module,
                optimizer: Optional[th.optim.Optimizer] = None,
-               scheduler: Optional[th.optim.lr_scheduler.LRScheduler] = None,
-               epoch: Optional[int] = None) -> None:
+               scheduler: Optional[th.optim.lr_scheduler.LRScheduler] = None) -> None:
     """
     Save the model, optimizer and scheduler state dicts.
     """
@@ -18,17 +17,15 @@ def save_state(checkpoint_path: str,
         state_dict["optimizer_state_dict"] = optimizer.state_dict()
     if scheduler is not None:
         state_dict["scheduler_state_dict"] = scheduler.state_dict()
-    if epoch is not None:
-        state_dict["epoch"] = epoch
     th.save(state_dict, checkpoint_path)
 
 
 def load_state(checkpoint_path: str,
                model: Optional[th.nn.Module] = None,
                optimizer: Optional[th.optim.Optimizer] = None,
-               scheduler: Optional[th.optim.lr_scheduler.LRScheduler] = None) -> Optional[int]:
+               scheduler: Optional[th.optim.lr_scheduler.LRScheduler] = None) -> None:
     """
-    Load the model, optimizer and scheduler state dicts and return the last epoch.
+    Load the model, optimizer and scheduler state dicts.
     """
 
     checkpoint = th.load(checkpoint_path)
@@ -38,7 +35,6 @@ def load_state(checkpoint_path: str,
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     if scheduler is not None:
         scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
-    return checkpoint.get("epoch", None)
 
 
 def count_parameters(model: th.nn.Module) -> int:
