@@ -1,0 +1,15 @@
+{
+    "num_channels": 3,
+    "learning_rate": 0.0002,
+    "weight_decay": 0.00001,
+    "gradient_clip": 10.0,
+    "transforms": [
+        {
+            "num_inv": 16,
+            "num_convs": 5,
+            "growth_rate": 16,
+            "kernel_size": 3,
+            "bias": true
+        }
+    ]
+}
