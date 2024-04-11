@@ -45,15 +45,14 @@ def main(batch_size: int,
 
     if checkpoint_path is not None:
         utils.load_state(checkpoint_path, model, optim, sched)
-        print(f"Resuming from {checkpoint_path}, epoch {sched.last_epoch + 1}.")
+        print(f"Resuming from {checkpoint_path}, epoch {sched.last_epoch}.")
 
     s = 2 ** len(config["transforms"])
     grad_clip = config["gradient_clip"]
-    cur_epoch = sched.last_epoch + 1
-    max_epoch = epochs + cur_epoch
+    max_epoch = epochs + sched.last_epoch
 
     print(f"Starting training for {s}x.")
-    for e in range(cur_epoch + 1, max_epoch + 1):
+    for e in range(sched.last_epoch + 1, max_epoch + 1):
         avg_loss, avg_hr_loss, avg_lr_loss, avg_pdm_loss = 0, 0, 0, 0
         start = time.perf_counter()
         if th.cuda.is_available():
