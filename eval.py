@@ -30,7 +30,7 @@ def main(checkpoint_path: str, config_path: str, data_path: str) -> None:
     for x, _ in dataloader:
         x = x.to(device)
         c, d = model(x)
-        c = model.inverse(utils.quantize(c), th.randn_like(d))
+        c = model.inverse(utils.quantize(c), th.zeros_like(d))
 
         c = utils.rgb2y(c)
         x = utils.rgb2y(x)
