@@ -5,7 +5,6 @@ import torch as th
 import torch.utils.data as thud
 import torchvision as tv
 import torchvision.transforms.functional as tvf
-from typing import Optional
 import utils
 
 
@@ -17,7 +16,7 @@ def main(batch_size: int,
          save_path: str,
          data_path: str,
          num_workers: int,
-         seed: Optional[int]) -> None:
+         seed: int) -> None:
 
     transform = tv.transforms.Compose([
         tv.transforms.RandomCrop(patch_size),
@@ -26,8 +25,7 @@ def main(batch_size: int,
         tv.transforms.ToTensor(),
     ])
 
-    if seed is not None:
-        th.manual_seed(10)
+    th.manual_seed(seed)
 
     dataset = tv.datasets.ImageFolder(data_path, transform=transform)
     dataloader = thud.DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
