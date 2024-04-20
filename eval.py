@@ -12,7 +12,7 @@ def main(checkpoint_path: str, config_path: str, data_path: str) -> None:
 
     dataset = tv.datasets.ImageFolder(data_path, transform=tv.transforms.ToTensor())
     dataloader = thud.DataLoader(dataset)
-    print(f"{len(dataset)} images found in {args.p2d} and loaded into {len(dataloader)} batches of size 1.")
+    print(f"{len(dataset)} images found in {data_path} and loaded into {len(dataloader)} batches of size 1.")
 
     device = "cuda" if th.cuda.is_available() else "cpu"
     with open(config_path, "r") as f:
@@ -22,13 +22,15 @@ def main(checkpoint_path: str, config_path: str, data_path: str) -> None:
     utils.load_state(checkpoint_path, model)
     print(f"Loaded {config_path} model ({device}) with {utils.count_parameters(model)} parameters.")
 
-    print(f"Starting evaluation for {2 ** len(config['transforms'])}x.")
+    s = 2 ** len(config['transforms'])
+    print(f"Starting evaluation for {s}x.")
     avg_loss = 0
     start = time.perf_counter()
     if th.cuda.is_available():
         th.cuda.reset_peak_memory_stats()
     for x, _ in dataloader:
         x = x.to(device)
+        x = utils.mod_crop(x, s)
         c, d = model(x)
         c = model.inverse(utils.quantize(c), th.zeros_like(d))
 

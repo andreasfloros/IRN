@@ -81,3 +81,13 @@ def charbonnier_loss(x: th.Tensor, y: th.Tensor, eps: float = 1e-3) -> th.Tensor
     """
 
     return ((x - y) ** 2 + eps ** 2).sqrt().sum() / x.shape[0]
+
+
+def mod_crop(x: th.Tensor, scale: int) -> th.Tensor:
+    """
+    Crop the input image dimensions to be a multiple of the scale.
+    """
+
+    h = x.shape[-2] - x.shape[-2] % scale
+    w = x.shape[-1] - x.shape[-1] % scale
+    return x[..., :h, :w]
