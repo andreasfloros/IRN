@@ -30,15 +30,15 @@ def main(checkpoint_path: str, config_path: str, data_path: str) -> None:
         th.cuda.reset_peak_memory_stats()
     for x, _ in dataloader:
         x = x.to(device)
-        x = utils.mod_crop(x, s)
+        x = utils.modcrop(x, s)
         c, d = model(x)
         c = model.inverse(utils.quantize(c), th.zeros_like(d))
 
         c = utils.rgb2y(c)
         x = utils.rgb2y(x)
         loss = -10 * th.nn.functional.mse_loss(c, x).log10()
-        avg_loss += loss.item() / len(dataloader)
-    print(f"PSNR: {avg_loss:.6e} dB, Time: {time.perf_counter() - start:.2f} s, \
+        avg_loss += loss.detach() / len(dataloader)
+    print(f"PSNR: {avg_loss.item():.6e} dB, Time: {time.perf_counter() - start:.2f} s, \
           Max Mem: {th.cuda.max_memory_allocated() / 1e9:.2f} GB")
 
 

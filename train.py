@@ -68,10 +68,10 @@ def main(batch_size: int,
             hr_loss = utils.charbonnier_loss(c, x)
             loss = hr_loss + pdm_loss + lr_loss * s ** 2
 
-            avg_hr_loss += hr_loss.item() / len(dataloader)
-            avg_lr_loss += lr_loss.item() / len(dataloader)
-            avg_pdm_loss += pdm_loss.item() / len(dataloader)
-            avg_loss += loss.item() / len(dataloader)
+            avg_hr_loss += hr_loss.detach() / len(dataloader)
+            avg_lr_loss += lr_loss.detach() / len(dataloader)
+            avg_pdm_loss += pdm_loss.detach() / len(dataloader)
+            avg_loss += loss.detach() / len(dataloader)
             if not th.isfinite(loss):
                 raise RuntimeError("Loss is not finite.")
             loss.backward()
@@ -80,9 +80,9 @@ def main(batch_size: int,
         sched.step()
         utils.save_state(save_path, model, optim, sched)
         print(f"Epoch {str(e).zfill(len(str(max_epoch)))}/{max_epoch}, \
-              Avg Loss: {avg_loss:.6e}, Avg HR Loss: {avg_hr_loss:.6e}, Avg LR Loss: {avg_lr_loss:.6e}, \
-              Avg PDM Loss: {avg_pdm_loss:.6e}, Time: {time.perf_counter() - start:.2f} s, \
-              Max Mem: {th.cuda.max_memory_allocated() / 1e9:.2f} GB")
+              Avg Loss: {avg_loss.item():.6e}, Avg HR Loss: {avg_hr_loss.item():.6e}, \
+              Avg LR Loss: {avg_lr_loss.item():.6e}, Avg PDM Loss: {avg_pdm_loss.item():.6e}, \
+              Time: {time.perf_counter() - start:.2f} s, Max Mem: {th.cuda.max_memory_allocated() / 1e9:.2f} GB")
 
 
 if __name__ == "__main__":

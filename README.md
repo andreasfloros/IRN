@@ -1,6 +1,6 @@
 # IRN: Invertible Rescaling Networks
 
-Implementation of [Invertible Rescaling Network and Its Extensions](https://link.springer.com/article/10.1007/s11263-022-01688-4) by Xiao et al.
+A minimal implementation of [Invertible Rescaling Network and Its Extensions](https://link.springer.com/article/10.1007/s11263-022-01688-4) by Xiao et al.
 
 |PSNR(Y), DIV2K | 2x | 4x | 8x |
 |:---------:|:---------:|:---------:|:---------:|
